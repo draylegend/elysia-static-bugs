@@ -1,0 +1,2 @@
+bunx nx run-many -t format lint test --fix
+git add -u

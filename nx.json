@@ -1,0 +1,55 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultProject": "app",
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "production": [
+      "default",
+      "!{projectRoot}/.eslintrc.json",
+      "!{projectRoot}/eslint.config.cjs",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/src/test-setup.[jt]s"
+    ],
+    "sharedGlobals": []
+  },
+  "targetDefaults": {
+    "@angular-devkit/build-angular:application": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    },
+    "@nx/eslint:lint": {
+      "cache": true,
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json",
+        "{workspaceRoot}/.eslintignore",
+        "{workspaceRoot}/eslint.config.cjs"
+      ]
+    },
+    "@nx/vite:test": { "cache": true, "inputs": ["default", "^production"] },
+    "e2e-ci--**/*": { "dependsOn": ["^build"] }
+  },
+  "plugins": [
+    { "plugin": "@nx/playwright/plugin", "options": { "targetName": "e2e" } },
+    { "plugin": "@nx/eslint/plugin", "options": { "targetName": "lint" } }
+  ],
+  "generators": {
+    "@nx/angular:application": {
+      "e2eTestRunner": "playwright",
+      "inlineStyle": true,
+      "linter": "eslint",
+      "prefix": "ff",
+      "serverRouting": true,
+      "ssr": true,
+      "style": "css",
+      "unitTestRunner": "vitest"
+    },
+    "@schematics/angular:component": {
+      "changeDetection": "OnPush",
+      "inlineStyle": true,
+      "type": "Feature"
+    }
+  }
+}
